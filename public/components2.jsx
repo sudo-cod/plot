@@ -7,6 +7,7 @@ const { useState: useState2, useEffect: useEffect2, useMemo: useMemo2 } = React;
 
 function TaskDetail({ task, now, onClose, onComplete, onUncomplete, onProgress, onDelete, onUpdate }) {
   if (!task) return null;
+  const { t } = useLanguage();
   const palette = PALETTES[task.paletteKey] || PALETTES.rose;
 
   const isProgress = task.kind === "progress";
@@ -101,7 +102,7 @@ function TaskDetail({ task, now, onClose, onComplete, onUncomplete, onProgress, 
         <div className="scroll" style={{ flex: 1, overflowY: "auto", padding: "20px 24px 30px" }}>
           {/* status / progress */}
           {isOneoff && (
-            <Section label="Status">
+            <Section label={t("statusHeader")}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <button
                   onClick={() => task.done ? onUncomplete(task.id) : onComplete(task.id)}
@@ -115,7 +116,7 @@ function TaskDetail({ task, now, onClose, onComplete, onUncomplete, onProgress, 
                     transition: "all .2s ease",
                   }}
                 >
-                  {task.done ? "✓ Completed — undo" : "Mark complete"}
+                  {task.done ? "✓ " + t("completedUndo") : t("markComplete")}
                 </button>
               </div>
             </Section>
@@ -331,6 +332,7 @@ function computeStreak(task, now) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AddTask({ onClose, onCreate }) {
+  const { t } = useLanguage();
   const [step, setStep] = useState2(1);
   const [kind, setKind] = useState2("weekly");
   const [title, setTitle] = useState2("");
@@ -385,8 +387,8 @@ function AddTask({ onClose, onCreate }) {
         {/* Header */}
         <div style={{ padding: "24px 28px 18px", borderBottom: "1px solid var(--line-2)", display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-3)", marginBottom: 4 }}>plant a seed</div>
-            <h2 className="serif" style={{ margin: 0, fontSize: 24, fontWeight: 500 }}>What are you growing?</h2>
+            <div style={{ fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-3)", marginBottom: 4 }}>{t("plantSeed")}</div>
+            <h2 className="serif" style={{ margin: 0, fontSize: 24, fontWeight: 500 }}>{t("whatGrowing")}</h2>
           </div>
           <button onClick={onClose} style={{ border: 0, background: "transparent", color: "var(--ink-2)", fontSize: 22, lineHeight: 1 }}>×</button>
         </div>

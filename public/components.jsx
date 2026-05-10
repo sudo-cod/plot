@@ -61,11 +61,12 @@ function targetFor(task) {
   return 1; // growth is already normalized
 }
 
-function periodLabel(task) {
-  if (task.kind === "oneoff") return "One-off";
-  if (task.kind === "progress") return "In progress";
-  const per = task.period === "day" ? "day" : task.period === "week" ? "week" : "month";
-  return `${task.target}× per ${per}`;
+function periodLabel(task, t = null) {
+  if (!t) t = (key) => key; // fallback if no translation function provided
+  if (task.kind === "oneoff") return t("oneOff");
+  if (task.kind === "progress") return t("inProgress");
+  const per = task.period === "day" ? t("perDay") : task.period === "week" ? t("perWeek") : t("perMonth");
+  return `${task.target}× ${per}`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
