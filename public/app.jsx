@@ -389,6 +389,36 @@ function AppContent() {
 
       {/* Tweaks */}
       <TweaksPanel>
+        <TweakSection label={t("language")} />
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <button
+            onClick={() => setLang("en")}
+            style={{
+              flex: 1, padding: "8px 12px", borderRadius: 6,
+              border: lang === "en" ? "2px solid var(--ink)" : "1px solid var(--line)",
+              background: lang === "en" ? "var(--ink)" : "transparent",
+              color: lang === "en" ? "var(--bg)" : "var(--ink)",
+              fontSize: 12, fontWeight: 500, cursor: "default",
+              transition: "all .2s",
+            }}
+          >
+            English
+          </button>
+          <button
+            onClick={() => setLang("zh")}
+            style={{
+              flex: 1, padding: "8px 12px", borderRadius: 6,
+              border: lang === "zh" ? "2px solid var(--ink)" : "1px solid var(--line)",
+              background: lang === "zh" ? "var(--ink)" : "transparent",
+              color: lang === "zh" ? "var(--bg)" : "var(--ink)",
+              fontSize: 12, fontWeight: 500, cursor: "default",
+              transition: "all .2s",
+            }}
+          >
+            中文
+          </button>
+        </div>
+
         <TweakSection label={t("atmosphere")} />
         <TweakRadio
           label={t("colorScheme")}
@@ -410,16 +440,6 @@ function AppContent() {
             { value: "comfy", label: t("comfy") },
           ]}
           onChange={(v) => setTweak("density", v)}
-        />
-        <TweakSection label={t("language")} />
-        <TweakRadio
-          label={t("language")}
-          value={lang}
-          options={[
-            { value: "en", label: t("english") },
-            { value: "zh", label: t("chinese") },
-          ]}
-          onChange={(v) => setLang(v)}
         />
         <TweakSection label={t("time")} />
         <TweakSlider
