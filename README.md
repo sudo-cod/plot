@@ -9,7 +9,8 @@ Plot is a beautiful task management app using a garden metaphor. Visualize your 
 - **Harvest View**: See completed tasks
 - **Task Types**: Daily habits, weekly goals, monthly targets, one-off tasks, and progress tracking
 - **Color Schemes**: Choose from Meadow, Twilight, Dawn, and Moss themes
-- **Data Persistence**: All your tasks and preferences are saved to your browser's local storage
+- **Multilingual Support**: Switch between English and Chinese (中文) — your language preference is remembered
+- **Data Persistence**: All your tasks, preferences, and language choice are saved to your browser's local storage
 - **Free Hosting**: Deploy to Vercel with a single click
 
 ## Getting Started
@@ -50,11 +51,25 @@ Plot is a beautiful task management app using a garden metaphor. Visualize your 
 
 Your app is now live! Share the URL with anyone who wants to use it.
 
+## Language Settings
+
+Plot supports English and Chinese (中文). To change the language:
+
+1. Look for the **Language** option in the Tweaks panel (bottom-right corner, gear icon)
+2. Select either **English** or **中文**
+3. All UI text updates immediately
+4. Your language preference is automatically saved and restored when you return
+
+Supported languages:
+- **English** — Full UI translation
+- **中文 (Chinese)** — 完整中文界面翻译
+
 ## Data Storage
 
-All tasks and preferences are stored in your browser's `localStorage`:
+All tasks, preferences, and language choice are stored in your browser's `localStorage`:
 - **Tasks**: Stored under `plot-tasks`
 - **Preferences**: Stored under `plot-tweaks`
+- **Language**: Stored under `plot-lang`
 
 Your data persists across browser sessions. To export your tasks, open the browser console and run:
 ```javascript
