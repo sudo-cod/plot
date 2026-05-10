@@ -1,0 +1,10 @@
+{
+  "name": "plot",
+  "version": "1.0.0",
+  "description": "Plot — a garden of tasks. Task management with plant growth visualization.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/plot.git"
+  }
+}
