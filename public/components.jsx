@@ -73,6 +73,7 @@ function periodLabel(task) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function Header({ now, view, setView, onAdd, weeklyDone }) {
+  const { t } = useLanguage();
   const dateStr = fmtDate(now);
   return (
     <header style={{
@@ -81,7 +82,7 @@ function Header({ now, view, setView, onAdd, weeklyDone }) {
     }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
         <span className="serif" style={{ fontSize: 28, fontWeight: 500, letterSpacing: "-0.02em" }}>
-          plot
+          {t("plot")}
           <span style={{ color: "var(--sage-deep)" }}>.</span>
         </span>
         <span style={{ fontSize: 13, color: "var(--ink-2)" }}>{dateStr}</span>
@@ -89,9 +90,9 @@ function Header({ now, view, setView, onAdd, weeklyDone }) {
 
       <nav style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,.5)", border: "1px solid var(--line)", padding: 3, borderRadius: 999 }}>
         {[
-          { id: "garden", label: "Garden" },
-          { id: "list",   label: "List" },
-          { id: "harvest",label: "Harvest" },
+          { id: "garden", label: t("garden") },
+          { id: "list",   label: t("list") },
+          { id: "harvest",label: t("harvest") },
         ].map((v) => (
           <button
             key={v.id}
@@ -110,9 +111,9 @@ function Header({ now, view, setView, onAdd, weeklyDone }) {
 
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <span style={{ fontSize: 12, color: "var(--ink-2)" }}>
-          <span className="serif" style={{ fontStyle: "italic", marginRight: 4 }}>this week</span>
+          <span className="serif" style={{ fontStyle: "italic", marginRight: 4 }}>{t("thisWeek")}</span>
           <span className="mono-num" style={{ color: "var(--ink)", fontWeight: 500 }}>{weeklyDone}</span>
-          <span style={{ color: "var(--ink-3)" }}> blooms</span>
+          <span style={{ color: "var(--ink-3)" }}> {t("blooms")}</span>
         </span>
         <button onClick={onAdd} style={{
           border: 0, background: "var(--ink)", color: "var(--bg)",
@@ -120,7 +121,7 @@ function Header({ now, view, setView, onAdd, weeklyDone }) {
           display: "flex", alignItems: "center", gap: 6,
           boxShadow: "0 2px 6px rgba(58,53,43,.15)",
         }}>
-          <span style={{ fontSize: 16, lineHeight: 1, marginTop: -1 }}>＋</span> Plant
+          <span style={{ fontSize: 16, lineHeight: 1, marginTop: -1 }}>＋</span> {t("plant")}
         </button>
       </div>
     </header>

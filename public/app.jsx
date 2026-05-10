@@ -218,11 +218,12 @@ const SCHEMES = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Main App
+// Main App with i18n wrapper
 // ─────────────────────────────────────────────────────────────────────────────
 
-function App() {
-  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+function AppContent() {
+  const { t, lang, setLang } = useLanguage();
+  const [tweak, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [tasks, setTasks] = useStateA(() => {
     const saved = localStorage.getItem("plot-tasks");
     if (saved) {
@@ -245,20 +246,20 @@ function App() {
 
   // Apply scheme to root css vars
   useEffectA(() => {
-    const sc = SCHEMES[t.scheme] || SCHEMES.meadow;
+    const sc = SCHEMES[tweak.scheme] || SCHEMES.meadow;
     const root = document.documentElement;
     root.style.setProperty("--bg", sc.bg);
     root.style.setProperty("--bg-2", sc.bg2);
     root.style.setProperty("--soil", sc.soil);
     root.style.setProperty("--ink", sc.ink);
-  }, [t.scheme]);
+  }, [tweak.scheme]);
 
   // "now" — base it on NOW + fastForward days
   const now = useMemoA(() => {
     const n = new Date(NOW);
-    n.setDate(n.getDate() + (t.fastForward || 0));
+    n.setDate(n.getDate() + (tweak.fastForward || 0));
     return n;
-  }, [t.fastForward]);
+  }, [tweak.fastForward]);
 
   const selected = tasks.find((x) => x.id === selectedId) || null;
 
@@ -343,7 +344,7 @@ function App() {
               now={now}
               onSelect={setSelectedId}
               selectedId={selectedId}
-              dense={t.density}
+              dense={tweak.density}
             />
             <Footnote now={now} />
           </div>
@@ -388,28 +389,42 @@ function App() {
 
       {/* Tweaks */}
       <TweaksPanel>
-        <TweakSection label="Atmosphere" />
+        <TweakSection label={t("atmosphere")} />
         <TweakRadio
-          label="Color scheme"
-          value={t.scheme}
+          label={t("colorScheme")}
+          value={tweak.scheme}
           options={[
-            { value: "meadow",   label: "Meadow" },
-            { value: "twilight", label: "Twilight" },
-            { value: "dawn",     label: "Dawn" },
-            { value: "moss",     label: "Moss" },
+            { value: "meadow",   label: t("scheme.meadow") },
+            { value: "twilight", label: t("scheme.twilight") },
+            { value: "dawn",     label: t("scheme.dawn") },
+            { value: "moss",     label: t("scheme.moss") },
           ]}
           onChange={(v) => setTweak("scheme", v)}
         />
         <TweakRadio
-          label="Density"
-          value={t.density}
-          options={["compact", "regular", "comfy"]}
+          label={t("density")}
+          value={tweak.density}
+          options={[
+            { value: "compact", label: t("compact") },
+            { value: "regular", label: t("regular") },
+            { value: "comfy", label: t("comfy") },
+          ]}
           onChange={(v) => setTweak("density", v)}
         />
-        <TweakSection label="Time" />
+        <TweakSection label={t("language")} />
+        <TweakRadio
+          label={t("language")}
+          value={lang}
+          options={[
+            { value: "en", label: t("english") },
+            { value: "zh", label: t("chinese") },
+          ]}
+          onChange={(v) => setLang(v)}
+        />
+        <TweakSection label={t("time")} />
         <TweakSlider
-          label="Fast-forward"
-          value={t.fastForward}
+          label={t("fastForward")}
+          value={tweak.fastForward}
           min={0}
           max={28}
           step={1}
@@ -417,19 +432,27 @@ function App() {
           onChange={(v) => setTweak("fastForward", v)}
         />
         <div style={{ fontSize: 10.5, color: "rgba(41,38,27,.55)", marginTop: -4, lineHeight: 1.4 }}>
-          Skip ahead in time to see how the garden evolves. Recurring tasks reset each week.
+          {t("fastForwardHelp")}
         </div>
       </TweaksPanel>
     </>
   );
 }
 
+function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
+  );
+}
+
 function Footnote({ now }) {
-  const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const day = days[new Date(now).getDay()];
+  const { t } = useLanguage();
+  const day = t("days")[new Date(now).getDay()];
   return (
     <div style={{ maxWidth: 1440, margin: "20px auto 40px", textAlign: "center", color: "var(--ink-3)", fontSize: 12 }}>
-      <span className="serif" style={{ fontStyle: "italic" }}>It's {day}.</span> Plants don't care which day you tend them. Just tend them.
+      <span className="serif" style={{ fontStyle: "italic" }}>{t("itIs")} {day}.</span> {t("plantsMessage")}
     </div>
   );
 }
