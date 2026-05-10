@@ -1,5 +1,4 @@
 {
-  "public": "public",
   "buildCommand": null,
   "outputDirectory": "public",
   "cleanUrls": true,
