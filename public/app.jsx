@@ -228,12 +228,26 @@ function AppContent() {
     const saved = localStorage.getItem("plot-tasks");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsedTasks = JSON.parse(saved);
+        // If tasks exist in localStorage, use them
+        if (parsedTasks && parsedTasks.length > 0) {
+          return parsedTasks.map(t => ({ ...t, paletteKey: paletteKey(t.paletteKey) }));
+        }
       } catch (e) {
         console.warn("Failed to load tasks from localStorage", e);
       }
     }
-    return SAMPLE_TASKS.map(t => ({ ...t, paletteKey: paletteKey(t.paletteKey) }));
+
+    // Check if this is a first-time user or if they want sample data
+    const hasSeenSampleData = localStorage.getItem("plot-has-seen-sample");
+    if (hasSeenSampleData) {
+      // User has seen sample data before, return empty array
+      return [];
+    } else {
+      // First-time user - show sample data and mark as seen
+      localStorage.setItem("plot-has-seen-sample", "true");
+      return SAMPLE_TASKS.map(t => ({ ...t, paletteKey: paletteKey(t.paletteKey) }));
+    }
   });
   const [view, setView] = useStateA("garden");
   const [selectedId, setSelectedId] = useStateA(null);
@@ -241,7 +255,24 @@ function AppContent() {
 
   // Persist tasks to localStorage whenever they change
   useEffectA(() => {
-    localStorage.setItem("plot-tasks", JSON.stringify(tasks));
+    try {
+      localStorage.setItem("plot-tasks", JSON.stringify(tasks));
+      // Also store a backup with timestamp for recovery
+      localStorage.setItem("plot-tasks-backup", JSON.stringify({
+        tasks,
+        timestamp: new Date().toISOString(),
+        version: "1.0"
+      }));
+    } catch (e) {
+      console.warn("Failed to save tasks to localStorage", e);
+      // Try to clear some space and save again
+      try {
+        localStorage.removeItem("plot-tasks-backup");
+        localStorage.setItem("plot-tasks", JSON.stringify(tasks));
+      } catch (e2) {
+        console.error("Critical: Failed to persist tasks", e2);
+      }
+    }
   }, [tasks]);
 
   // Apply scheme to root css vars
@@ -331,6 +362,48 @@ function AppContent() {
     setTasks((cur) => [...cur, newTask]);
     setSelectedId(id);
   }, []);
+
+  // Data persistence helpers
+  const exportData = useCallbackA(() => {
+    const data = {
+      tasks,
+      tweaks: tweak,
+      language: lang,
+      exportDate: new Date().toISOString(),
+      version: "1.0"
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `plot-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [tasks, tweak, lang]);
+
+  const importData = useCallbackA((file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.tasks) {
+          setTasks(data.tasks);
+        }
+        if (data.tweaks) {
+          Object.entries(data.tweaks).forEach(([key, value]) => {
+            setTweak(key, value);
+          });
+        }
+        if (data.language) {
+          setLang(data.language);
+        }
+        alert("Data imported successfully!");
+      } catch (error) {
+        alert("Failed to import data. Please check the file format.");
+      }
+    };
+    reader.readAsText(file);
+  }, [setTasks, setTweak, setLang]);
 
   return (
     <>
@@ -454,7 +527,75 @@ function AppContent() {
         <div style={{ fontSize: 10.5, color: "rgba(41,38,27,.55)", marginTop: -4, lineHeight: 1.4 }}>
           {t("fastForwardHelp")}
         </div>
+
+        <TweakSection label="Data Backup" />
+        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+          <button
+            onClick={exportData}
+            style={{
+              flex: 1, padding: "6px 8px", borderRadius: 6,
+              border: "1px solid var(--line)",
+              background: "transparent",
+              color: "var(--ink)",
+              fontSize: 11, fontWeight: 500, cursor: "default",
+              transition: "all .2s"
+            }}
+          >
+            Export
+          </button>
+          <button
+            onClick={() => document.getElementById('import-file').click()}
+            style={{
+              flex: 1, padding: "6px 8px", borderRadius: 6,
+              border: "1px solid var(--line)",
+              background: "transparent",
+              color: "var(--ink)",
+              fontSize: 11, fontWeight: 500, cursor: "default",
+              transition: "all .2s"
+            }}
+          >
+            Import
+          </button>
+          <input
+            id="import-file"
+            type="file"
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={(e) => e.target.files[0] && importData(e.target.files[0])}
+          />
+        </div>
+        <div style={{ fontSize: 10, color: "rgba(41,38,27,.5)", lineHeight: 1.3 }}>
+          Backup your garden data before updates
+        </div>
       </TweaksPanel>
+
+      {/* Floating Tweaks Toggle Button */}
+      <button
+        onClick={() => window.postMessage({ type: '__activate_edit_mode' }, '*')}
+        style={{
+          position: 'fixed',
+          right: '16px',
+          bottom: '16px',
+          zIndex: 2147483645,
+          width: '48px',
+          height: '48px',
+          borderRadius: '50%',
+          border: 'none',
+          background: 'var(--ink)',
+          color: 'var(--bg)',
+          fontSize: '20px',
+          fontWeight: '500',
+          cursor: 'default',
+          boxShadow: '0 4px 12px rgba(58,53,43,.15)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all .2s'
+        }}
+        title="Open Tweaks Panel"
+      >
+        ⚙️
+      </button>
     </>
   );
 }
